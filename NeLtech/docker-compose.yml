@@ -14,7 +14,7 @@ services:
     expose:
       - "5173"
     depends_on:
-      - backend
+      - backend  
   backend:
     build:
       context: ./NeLtech-back
@@ -28,7 +28,7 @@ services:
     networks:
       - neltech
     expose:
-      - 8000
+      - 8000    
   db:
     image: mysql:8.0
     container_name: neltech_db
@@ -46,17 +46,31 @@ services:
       - neltech
     expose:
       - 3306
-
   nginx-reverse:
     image: nginx:latest
     container_name: neltech_nginx
     volumes: 
       - ./nginx/web.conf:/etc/nginx/nginx.conf
     ports:
-      - "80:80"
+      - "1234:1234"
     depends_on:
       - frontend
       - backend
+    networks:
+      - neltech
+    expose:
+      - 1234
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: neltech_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "80:80"
     networks:
       - neltech
     expose:
