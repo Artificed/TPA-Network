@@ -83,6 +83,17 @@ services:
       - '3000:3000'
     volumes:
       - grafana-storage:/var/lib/grafana
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: unless-stopped
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
 
 networks:
  neltech:
@@ -90,3 +101,4 @@ networks:
 volumes:
   laravel-db:
   grafana-storage: {}
+  prom_data:
