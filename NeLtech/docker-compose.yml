@@ -75,8 +75,18 @@ services:
       - neltech
     expose:
       - 80
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports: 
+      - '3000:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
 networks:
  neltech:
     driver: bridge
 volumes:
   laravel-db:
+  grafana-storage: {}
