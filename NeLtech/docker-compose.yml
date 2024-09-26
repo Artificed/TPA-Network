@@ -13,22 +13,36 @@ services:
       - neltech
     expose:
       - "5173"
+    deploy:
+      replicas: 1
     depends_on:
       - backend  
   backend:
     build:
       context: ./NeLtech-back
       dockerfile: Dockerfile
-    ports: 
-      - "8000:8000"
     restart: unless-stopped
     working_dir: /var/www
+    deploy:
+      replicas: 3
     depends_on:
       - db
     networks:
       - neltech
     expose:
-      - 8000    
+      - "8000"
+  haproxy:
+    build:
+      context: ./haproxy
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - backend
+    networks:
+      - neltech
+    expose:
+      - 8000
   db:
     image: mysql:8.0
     container_name: neltech_db
@@ -42,13 +56,14 @@ services:
       SERVICE_NAME: mysql
     volumes: 
       - laravel-db:/data/db
+    deploy:
+      replicas: 1
     networks:
       - neltech
     expose:
       - 3306
   nginx-reverse:
     image: nginx:latest
-    container_name: neltech_nginx
     volumes: 
       - ./nginx/web.conf:/etc/nginx/nginx.conf
     ports:
@@ -62,7 +77,6 @@ services:
       - 1234
   phpmyadmin:
     image: phpmyadmin:latest
-    container_name: neltech_phpmyadmin
     restart: unless-stopped
     depends_on:
       - db
@@ -71,6 +85,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "80:80"
+    deploy:
+      replicas: 1
     networks:
       - neltech
     expose:
